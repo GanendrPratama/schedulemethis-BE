@@ -1,0 +1,31 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  events    Event[]  @relation("UserEvents")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  duration    Int      // Duration in minutes
+  startTime   DateTime? // Assigned or suggested start time
+  endTime     DateTime? // Assigned or suggested end time
+  status      String   @default("SUGGESTED") // "SUGGESTED", "ACCEPTED", "DENIED"
+  userId      String
+  user        User     @relation("UserEvents", fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
